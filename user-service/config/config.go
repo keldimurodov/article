@@ -1,34 +1,41 @@
 package config
 
 import (
-	"github.com/spf13/cast"
 	"os"
+
+	"github.com/spf13/cast"
 )
 
+// Config ...
 type Config struct {
-	Envoriment       string //developing, staging, production
-	PostgresHost     string
-	PostgresPort     int
-	PostgresDatabase string
-	PostgresUser     string
-	PostgresPassword string
-	LogLevel         string
-	RPCPort          string
+	Environment       string // develop, staging, production
+	PostgresHost      string
+	PostgresPort      int
+	PostgresDatabase  string
+	PostgresUser      string
+	PostgresPassword  string
+	LogLevel          string
+	RPCPort           string
+
+	PostServiceHost string
+	PostServicePort int
 }
 
+// Load loads environment vars and inflates Config
 func Load() Config {
 	c := Config{}
 
-	c.Envoriment = cast.ToString(getOrReturnDefault("ENVIROMENT", "develop"))
+	c.Environment = cast.ToString(getOrReturnDefault("ENVIRONMENT", "develop"))
+
 	c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "localhost"))
 	c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5432))
-	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DATABASE", "users"))
+	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DATABASE", "article"))
 	c.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "postgres"))
 	c.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "123"))
 
 	c.LogLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
 
-	c.RPCPort = cast.ToString(getOrReturnDefault("RPC_PORT", ":9000"))
+	c.RPCPort = cast.ToString(getOrReturnDefault("RPC_PORT", ":3333"))
 
 	return c
 }
