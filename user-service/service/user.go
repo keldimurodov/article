@@ -12,24 +12,26 @@ import (
 
 // UserService ...
 type UserService struct {
-	storage      storage.IStorage
-	logger       l.Logger
-	db           *sql.DB
+	storage storage.IStorage
+	logger  l.Logger
+	db      *sql.DB
 }
 
 // NewUserService ...
 func NewUserService(db *sqlx.DB, log l.Logger) *UserService {
 	return &UserService{
-		storage:      storage.NewStoragePg(db),
-		logger:       log,
+		storage: storage.NewStoragePg(db),
+		logger:  log,
 	}
 }
 
 func (s *UserService) Create(ctx context.Context, req *u.User) (*u.User, error) {
+	
 	user, err := s.storage.User().Create(req)
 	if err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }
 

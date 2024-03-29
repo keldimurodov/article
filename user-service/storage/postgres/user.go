@@ -3,6 +3,7 @@ package postgres
 import (
 	"fmt"
 	u "projects/article/user-service/genproto/user"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -232,4 +233,60 @@ func (r *userRepo) GetAll(user *u.GetAllRequest) (*u.GetAllResponse, error) {
 		allUser.Users = append(allUser.Users, &user)
 	}
 	return &allUser, nil
+}
+
+func (s *userRepo) CheckUniqueness(req *u.CheckUniquenessRequest) (*u.CheckUniquenessResponse, error) {
+	var email int
+
+	fmt.Println(req.Field, req.Value)
+
+	query := fmt.Sprintf("SELECT count(1) from users WHERE %s = $1 ", req.Field)
+	err := s.db.QueryRow(query, req.Value).Scan(&email)
+	if err != nil {
+		log.Fatal("error while checking!!!", err.Error())
+	}
+	if email == 1 {
+
+		return &u.CheckUniquenessResponse{
+			Result: true,
+		}, nil
+	}
+
+	return &u.CheckUniquenessResponse{
+		Result: false,
+	}, nil
+}
+
+func (r *userRepo) Login(id *u.LoginRequest) (*u.User, error) {
+	var user u.User
+	query := `
+	SELECT
+		id,
+		first_name,
+		last_name,
+		email,
+		password,
+		created_at,
+		updeted_at
+	FROM 
+		users
+	WHERE
+		email=$1
+	AND 
+		password = $2
+	AND deleted_at IS NULL
+	`
+	err := r.db.QueryRow(query, id.Email, id.Password).Scan(
+		&user.Id,
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+		&user.UpdetedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }

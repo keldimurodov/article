@@ -9,35 +9,10 @@ import (
 	"projects/article/user-service/service"
 
 	"google.golang.org/grpc"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo"
-	"context"
-	"log"
-	"fmt"
 )
 
 func main() {
 
-
-	// MongoDB-ga bog'lanish
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err = client.Disconnect(context.Background()); err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	// MongoDB-ga ulanishni sinab ko'rish
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		log.Fatal("MongoDB-ga ulanish muammo:", err)
-	}
-
-	fmt.Println("MongoDB-ga muvaffaqiyatli ulanildi.")
 
 	cfg := config.Load()
 
@@ -54,7 +29,7 @@ func main() {
 		log.Fatal("sqlx connection to postgres error", logger.Error(err))
 	}
 
-	userService := service.NewUserService(connDB,  log)
+	userService := service.NewUserService(connDB, log)
 
 	lis, err := net.Listen("tcp", cfg.RPCPort)
 	if err != nil {

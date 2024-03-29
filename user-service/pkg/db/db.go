@@ -6,6 +6,10 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" //postgres drivers
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"context"
+	"log"
 )
 
 func ConnectToDB(cfg config.Config) (*sqlx.DB, error) {
@@ -23,6 +27,32 @@ func ConnectToDB(cfg config.Config) (*sqlx.DB, error) {
 	}
 
 	return connDb, nil
+}
+
+
+func ConnectMongoDB(cfg config.Config) (*mongo.Client, error){
+
+	// MongoDB-ga bog'lanish
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err = client.Disconnect(context.Background()); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	// MongoDB-ga ulanishni sinab ko'rish
+	err = client.Ping(context.Background(), nil)
+	if err != nil {
+		log.Fatal("MongoDB-ga ulanish muammo:", err)
+	}
+
+	fmt.Println("MongoDB-ga muvaffaqiyatli ulanildi.")	
+
+	return client, nil
 }
 
 
