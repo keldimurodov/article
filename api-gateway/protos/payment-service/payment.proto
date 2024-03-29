@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package payments;
+
+option go_package = "/payments";
+
+service PaymentService {
+    rpc Pay(PPT) returns (Status);
+}
+  
+message Status {
+    bool liked = 1;
+}
+  
+message PPT{
+    string user_id = 1;
+}
